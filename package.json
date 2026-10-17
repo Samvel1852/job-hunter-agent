@@ -1,0 +1,19 @@
+{
+  "name": "job-hunter-agent",
+  "private": true,
+  "type": "module",
+  "description": "Daily Product Manager / Product Owner job hunter with tailored CVs and cover letters",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "node --import tsx --test test/*.test.ts",
+    "dev": "bdk dev"
+  },
+  "dependencies": {
+    "@cursor/bdk": "^0.2.25",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "6.0.3"
+  }
+}
