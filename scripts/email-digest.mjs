@@ -172,13 +172,34 @@ const existing = await github(
 const already = Array.isArray(existing.body)
   ? existing.body.find((issue) => issue.title === title)
   : undefined;
-if (already?.html_url) {
+if (already?.html_url && !process.argv.includes('--remind')) {
   console.log(
     JSON.stringify({
       delivered: false,
       reason: 'already-sent',
       url: already.html_url,
       author: already.user?.login ?? null,
+    }),
+  );
+  process.exit(0);
+}
+
+if (already?.html_url && process.argv.includes('--remind')) {
+  const comment = await github(token, 'POST', `/repos/${OWNER}/${REPO}/issues/${already.number}/comments`, {
+    body,
+  });
+  if (!comment.ok) {
+    console.error(
+      `Could not remind with the digest (${comment.status}): ${redact(JSON.stringify(comment.body)).slice(0, 400)}`,
+    );
+    process.exit(1);
+  }
+  console.log(
+    JSON.stringify({
+      delivered: true,
+      reason: 'reminded',
+      url: comment.body.html_url,
+      author: comment.body.user?.login ?? null,
     }),
   );
   process.exit(0);
