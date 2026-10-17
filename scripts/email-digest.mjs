@@ -16,9 +16,11 @@ function githubRepo() {
   const match = remote.match(/github\.com[:/]([^/]+)\/([^/.]+)/);
   if (!match) throw new Error('Origin is not a GitHub repository.');
   const gitRoot = git(['rev-parse', '--show-toplevel']);
-  const branch = git(['rev-parse', '--abbrev-ref', 'HEAD']);
+  // Review pages are published on main. An automation checkout is often an
+  // unpublished branch, and a slash in that name makes a raw URL 404. htmlpreview
+  // then shows a blank page.
   const reviewPrefix = relative(gitRoot, reviewDir).split('\\').join('/');
-  return { owner: match[1], repo: match[2], branch, reviewPrefix };
+  return { owner: match[1], repo: match[2], branch: 'main', reviewPrefix };
 }
 
 function decode(value) {
