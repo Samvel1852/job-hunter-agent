@@ -18,6 +18,7 @@ export default defineTool({
       region: z.string(),
       url: z.string().url(),
       applyUrl: z.string().url().optional(),
+      employerEmail: z.string().email().optional(),
     }),
     fitScore: z.number().min(0).max(100),
     fitReasons: z.array(z.string()).min(1).max(6),

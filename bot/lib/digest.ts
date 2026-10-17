@@ -1,3 +1,4 @@
+import { resolveApplication } from './apply.js';
 import { CANDIDATE } from './config.js';
 import type { ApplicationPack } from './store.js';
 
@@ -79,34 +80,57 @@ const STYLES = `
   .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
   button, .button { font: inherit; border: 0; border-radius: 10px; padding: 10px 16px; cursor: pointer; text-decoration: none; background: rgba(127,127,127,.18); color: inherit; }
   .primary { background: var(--accent); color: #fff; font-weight: 600; }
-  .toast { position: fixed; bottom: 20px; right: 20px; background: #111827; color: #fff; padding: 10px 14px; border-radius: 10px; opacity: 0; transition: opacity .2s; }
+  .route { color: var(--muted); font-size: .85rem; margin-top: 8px; }
+  .toast { position: fixed; bottom: 20px; right: 20px; background: #111827; color: #fff; padding: 10px 14px; border-radius: 10px; opacity: 0; transition: opacity .2s; max-width: 420px; }
   .toast.show { opacity: 1; }
 `;
 
-const SCRIPT = `
+export const CLIENT_SCRIPT = `
   const packs = JSON.parse(document.getElementById('packs').textContent);
-  const toast = (text) => { const el = document.getElementById('toast'); el.textContent = text; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2500); };
+  const toast = (text) => { const el = document.getElementById('toast'); el.textContent = text; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 4200); };
   const storageKey = (id) => 'job-hunter:applied:' + id;
   const markApplied = (id) => { localStorage.setItem(storageKey(id), new Date().toISOString()); document.querySelector('[data-job="' + CSS.escape(id) + '"]').classList.add('applied'); };
   const printCv = (pack) => {
     const win = window.open('', '_blank');
-    if (!win) { toast('Allow pop-ups to download the CV'); return; }
+    if (!win) { toast('Allow pop-ups to download the CV'); return false; }
     win.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' + pack.cvTitle + '</title><style>body{font-family:system-ui,sans-serif;max-width:800px;margin:32px auto;line-height:1.45;color:#111} h1{margin-bottom:0} h2{border-bottom:1px solid #ddd;padding-bottom:4px;margin-top:20px} ul{padding-left:20px} @page{margin:16mm}</style></head><body>' + pack.cvHtml + '</body></html>');
     win.document.close();
     win.focus();
     setTimeout(() => win.print(), 300);
+    return true;
   };
   const copy = async (text) => { try { await navigator.clipboard.writeText(text); return true; } catch { return false; } };
+  const openTab = (url) => { if (!url) return true; return Boolean(window.open(url, '_blank', 'noopener')); };
   document.querySelectorAll('[data-action]').forEach((button) => {
     button.addEventListener('click', async () => {
       const pack = packs[button.dataset.index];
       if (button.dataset.action === 'cv') printCv(pack);
       if (button.dataset.action === 'letter') toast((await copy(pack.coverLetter)) ? 'Cover letter copied' : 'Copy failed');
       if (button.dataset.action === 'apply') {
-        window.open(pack.applyUrl, '_blank', 'noopener');
         const copied = await copy(pack.coverLetter);
-        markApplied(pack.id);
-        toast(copied ? 'Apply page opened and cover letter copied' : 'Apply page opened');
+        if (pack.channel === 'email') {
+          const opened = openTab(pack.gmailUrl);
+          markApplied(pack.id);
+          toast(opened
+            ? 'Gmail is open from sam.demirtshyan@gmail.com. Press Send to deliver the application.'
+            : 'Allow pop-ups, then click Apply by email again.');
+        } else if (pack.channel === 'site') {
+          const opened = openTab(pack.applyUrl);
+          if (pack.canvaUrl) openTab(pack.canvaUrl);
+          else printCv(pack);
+          markApplied(pack.id);
+          toast(opened
+            ? (copied ? 'Company form and Canva CV are open. Paste the copied cover letter and submit the form.' : 'Company form and Canva CV are open. Submit the form there.')
+            : 'Allow pop-ups, then click Apply on company site again.');
+        } else {
+          const opened = openTab(pack.listingUrl);
+          if (pack.canvaUrl) openTab(pack.canvaUrl);
+          else printCv(pack);
+          markApplied(pack.id);
+          toast(opened
+            ? (copied ? 'Listing and Canva CV are open, and the cover letter is copied. Submit it on that site.' : 'Listing and Canva CV are open. Submit the application on that site.')
+            : 'Allow pop-ups, then click Apply on listing again.');
+        }
       }
     });
   });
@@ -121,6 +145,14 @@ function list(items: string[]): string {
 
 function renderPack(pack: ApplicationPack, index: number): string {
   const { job } = pack;
+  const route = resolveApplication({
+    title: job.title,
+    listingUrl: job.url,
+    applyUrl: job.applyUrl,
+    employerEmail: job.employerEmail,
+    coverLetter: pack.coverLetter,
+    canvaUrl: pack.canvaUrl,
+  });
   return `
   <article class="job" data-job="${escapeHtml(job.id)}">
     <div class="top">
@@ -128,6 +160,7 @@ function renderPack(pack: ApplicationPack, index: number): string {
         <h2>${escapeHtml(job.title)}</h2>
         <div class="meta">${escapeHtml(job.company)} · ${escapeHtml(job.location)}</div>
         <div style="margin-top:6px"><span class="badge">${escapeHtml(job.source)}</span><span class="badge">${escapeHtml(job.region)}</span><a class="meta" href="${safeHref(job.url)}" target="_blank" rel="noopener">View posting</a></div>
+        <div class="route">${escapeHtml(route.route)}</div>
       </div>
       <div class="score">${Math.round(pack.fitScore)}% fit</div>
     </div>
@@ -140,7 +173,7 @@ function renderPack(pack: ApplicationPack, index: number): string {
     <details><summary>Preview tailored CV</summary><div class="doc">${renderMarkdown(pack.cvMarkdown)}</div></details>
     <details><summary>Preview cover letter</summary><div class="doc letter">${escapeHtml(pack.coverLetter)}</div></details>
     <div class="actions">
-      <button class="primary" data-action="apply" data-index="${index}">Apply</button>
+      <button class="primary" data-action="apply" data-index="${index}">${escapeHtml(route.buttonLabel)}</button>
       <button data-action="cv" data-index="${index}">Download CV (PDF)</button>
       <button data-action="letter" data-index="${index}">Copy cover letter</button>
       ${pack.canvaUrl ? `<a class="button" href="${safeHref(pack.canvaUrl)}" target="_blank" rel="noopener">Open Canva CV</a>` : ''}
@@ -150,13 +183,28 @@ function renderPack(pack: ApplicationPack, index: number): string {
 
 export function renderDigest(date: string, packs: ApplicationPack[]): string {
   const sorted = [...packs].sort((a, b) => b.fitScore - a.fitScore);
-  const payload = sorted.map((pack) => ({
-    id: pack.job.id,
-    applyUrl: /^https?:\/\//i.test(pack.job.applyUrl ?? '') ? pack.job.applyUrl : pack.job.url,
-    coverLetter: pack.coverLetter,
-    cvTitle: escapeHtml(`${CANDIDATE.name} - ${pack.job.title} - ${pack.job.company}`),
-    cvHtml: renderMarkdown(pack.cvMarkdown),
-  }));
+  const payload = sorted.map((pack) => {
+    const route = resolveApplication({
+      title: pack.job.title,
+      listingUrl: pack.job.url,
+      applyUrl: pack.job.applyUrl,
+      employerEmail: pack.job.employerEmail,
+      coverLetter: pack.coverLetter,
+      canvaUrl: pack.canvaUrl,
+    });
+    return {
+      id: pack.job.id,
+      channel: route.channel,
+      listingUrl: route.listingUrl,
+      ...(route.applyUrl ? { applyUrl: route.applyUrl } : {}),
+      ...(route.gmailUrl ? { gmailUrl: route.gmailUrl } : {}),
+      ...(route.canvaUrl ? { canvaUrl: route.canvaUrl } : {}),
+      ...(route.employerEmail ? { employerEmail: route.employerEmail } : {}),
+      coverLetter: pack.coverLetter,
+      cvTitle: escapeHtml(`${CANDIDATE.name} - ${pack.job.title} - ${pack.job.company}`),
+      cvHtml: renderMarkdown(pack.cvMarkdown),
+    };
+  });
   const json = JSON.stringify(payload).replace(/</g, '\\u003c');
   return `<!doctype html>
 <html lang="en">
@@ -169,12 +217,12 @@ export function renderDigest(date: string, packs: ApplicationPack[]): string {
 <body>
 <header>
   <h1>${sorted.length} best-fit Product roles · ${escapeHtml(date)}</h1>
-  <p>Review each tailored CV and cover letter. <strong>Download CV (PDF)</strong> opens the tailored CV ready to save as PDF; <strong>Apply</strong> opens the application page, copies the cover letter and marks the job as applied.</p>
+  <p><strong>View posting</strong> opens the job listing. <strong>Apply by email</strong> opens Gmail from ${escapeHtml(CANDIDATE.email)} with the cover letter and Canva CV filled in; press Send to deliver it. <strong>Apply on company site</strong> opens the employer form and the Canva CV, and copies the cover letter.</p>
 </header>
 ${sorted.map(renderPack).join('\n') || '<p>No matches were saved for this day yet.</p>'}
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script type="application/json" id="packs">${json}</script>
-<script>${SCRIPT}</script>
+<script>${CLIENT_SCRIPT}</script>
 </body>
 </html>`;
 }

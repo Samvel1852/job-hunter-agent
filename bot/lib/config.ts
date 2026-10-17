@@ -23,6 +23,7 @@ export const ALL_SOURCES: JobSource[] = [
 
 export const CANDIDATE = {
   name: 'Samvel Demirtshyan',
+  email: 'sam.demirtshyan@gmail.com',
   canvaDesignId: 'DAHYNhleQV4',
   canvaDesignUrl: 'https://www.canva.com/design/DAHYNhleQV4/htPca5hyr4h524p9R2tLaQ/edit',
   timeZone: 'Asia/Yerevan',

@@ -1,5 +1,5 @@
 import type { Region } from '../config.js';
-import { cleanInline, fetchText } from '../http.js';
+import { cleanInline, decodeEntities, fetchText } from '../http.js';
 import { classifyRegion, type JobPosting } from './types.js';
 
 const BASE = 'https://www.google.com/about/careers/applications';
@@ -8,6 +8,18 @@ export function googleCareersSearchUrl(query: string, location?: string) {
   const params = new URLSearchParams({ q: query });
   if (location) params.set('location', location);
   return `${BASE}/jobs/results?${params}`;
+}
+
+/** Google Careers puts the real application on a relative ./apply link beside the listing. */
+export function googleCareersApplyUrl(listingUrl: string, html: string): string | undefined {
+  const match = /href="(\.\/apply\?[^"]+)"/i.exec(html);
+  if (!match) return undefined;
+  try {
+    const url = new URL(decodeEntities(match[1]), listingUrl);
+    return url.protocol === 'https:' ? url.toString() : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export function parseGoogleCareersSearch(html: string, region: Region): JobPosting[] {

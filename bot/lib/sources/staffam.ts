@@ -25,10 +25,29 @@ type StaffJobData = {
         responsibilities?: Localized;
         required_qualifications?: Localized;
         additional_information?: Localized;
+        application_procedures?: Localized;
+        job_url?: string;
       };
     };
   };
 };
+
+/** staff.am stores the employer's own form in job_url, often as an originUrl on a staff.am wrapper. */
+export function staffamCompanyApplyUrl(jobUrl?: string): string | undefined {
+  if (!jobUrl) return undefined;
+  try {
+    const absolute = jobUrl.startsWith('http') ? new URL(jobUrl) : new URL(jobUrl, 'https://staff.am');
+    const origin = absolute.searchParams.get('originUrl');
+    if (origin && /^https?:\/\//i.test(origin)) {
+      const company = new URL(origin);
+      if (!company.hostname.endsWith('staff.am')) return company.toString();
+    }
+    if (!absolute.hostname.endsWith('staff.am')) return absolute.toString();
+  } catch {
+    return undefined;
+  }
+  return undefined;
+}
 
 export function staffamSearchUrl(keywords: string, page = 1) {
   const params = new URLSearchParams({ key_word: keywords, page: String(page) });
@@ -65,10 +84,15 @@ export function parseStaffamPosting(html: string): JobDetails {
     ['Responsibilities', job?.responsibilities],
     ['Required qualifications', job?.required_qualifications],
     ['Additional information', job?.additional_information],
+    ['How to apply', job?.application_procedures],
   ];
   const text = sections
     .filter(([, value]) => value?.en)
     .map(([heading, value]) => `## ${heading}\n${htmlToText(value?.en ?? '')}`)
     .join('\n\n');
-  return { text: text || htmlToText(html) };
+  const applyUrl = staffamCompanyApplyUrl(job?.job_url);
+  return {
+    text: text || htmlToText(html),
+    ...(applyUrl ? { applyUrl } : {}),
+  };
 }

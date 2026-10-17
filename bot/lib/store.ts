@@ -18,6 +18,7 @@ export type ApplicationPack = {
     region: string;
     url: string;
     applyUrl?: string;
+    employerEmail?: string;
   };
   fitScore: number;
   fitReasons: string[];

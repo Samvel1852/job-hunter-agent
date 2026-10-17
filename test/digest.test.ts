@@ -44,13 +44,35 @@ describe('renderDigest', () => {
     assert.ok(html.indexOf('High fit') < html.indexOf('Low fit'));
     assert.ok(html.includes('Acme &lt;script&gt;'));
     assert.ok(!html.includes('</script><script>alert(1)'));
+    assert.ok(html.includes('"channel":"site"'));
     assert.ok(html.includes('"applyUrl":"https://jobs.acme.com/apply"'));
+    assert.ok(html.includes('Apply on company site'));
+    assert.ok(html.includes('View posting'));
   });
 
-  it('falls back to the posting url when there is no safe apply url', () => {
+  it('keeps a board listing off the apply action', () => {
     const html = renderDigest('2026-10-16', [
       pack({ job: { ...pack().job, applyUrl: 'javascript:alert(1)' } }),
     ]);
-    assert.ok(html.includes('"applyUrl":"https://www.linkedin.com/jobs/view/1"'));
+    assert.ok(html.includes('"channel":"board"'));
+    assert.ok(html.includes('"listingUrl":"https://www.linkedin.com/jobs/view/1"'));
+    assert.ok(!html.includes('javascript:alert'));
+    assert.ok(html.includes('Apply on listing'));
+  });
+
+  it('builds a Gmail compose link from the employer email', () => {
+    const html = renderDigest('2026-10-16', [
+      pack({
+        job: {
+          ...pack().job,
+          applyUrl: undefined,
+          employerEmail: 'jobs@optimum.am',
+        },
+      }),
+    ]);
+    assert.ok(html.includes('"channel":"email"'));
+    assert.ok(html.includes('authuser=sam.demirtshyan%40gmail.com'));
+    assert.ok(html.includes('to=jobs%40optimum.am'));
+    assert.ok(html.includes('Apply by email'));
   });
 });

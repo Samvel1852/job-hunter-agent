@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { parseGoogleCareersSearch } from '../bot/lib/sources/googleCareers.js';
+import { googleCareersApplyUrl, parseGoogleCareersSearch } from '../bot/lib/sources/googleCareers.js';
 import type { Region } from '../bot/lib/config.js';
 import { fingerprint, interleaveByRegion, isProductRole } from '../bot/lib/sources/index.js';
 import {
@@ -8,7 +8,7 @@ import {
   parseLinkedinPosting,
   parseLinkedinSearch,
 } from '../bot/lib/sources/linkedin.js';
-import { parseStaffamPosting, parseStaffamSearch } from '../bot/lib/sources/staffam.js';
+import { parseStaffamPosting, parseStaffamSearch, staffamCompanyApplyUrl } from '../bot/lib/sources/staffam.js';
 import { classifyRegion } from '../bot/lib/sources/types.js';
 
 const linkedinCard = `<li>
@@ -103,9 +103,31 @@ describe('staff.am', () => {
       text: '## Description\nJoin us.\n\n## Responsibilities\n- Own backlog',
     });
   });
+
+  it('reads the employer form out of a staff.am wrapper link', () => {
+    const origin = 'https://amiobank.spark.work/career/job/308/application?lang=am';
+    const jobUrl = `/en/applicants/job-announcement/add-cv-submits?id=1&originUrl=${encodeURIComponent(origin)}`;
+    assert.equal(staffamCompanyApplyUrl(jobUrl), origin);
+    const html = nextData({
+      job: {
+        description: { en: '<p>Join us.</p>' },
+        job_url: jobUrl,
+      },
+    });
+    assert.equal(parseStaffamPosting(html).applyUrl, origin);
+  });
 });
 
 describe('google careers', () => {
+  it('reads the apply link next to the listing', () => {
+    const listing = 'https://www.google.com/about/careers/applications/jobs/results/123';
+    const html = '<a href="./apply?jobId=abc&amp;loc=PL">Apply</a>';
+    assert.equal(
+      googleCareersApplyUrl(listing, html),
+      'https://www.google.com/about/careers/applications/jobs/results/apply?jobId=abc&loc=PL',
+    );
+  });
+
   it('parses result cards', () => {
     const html = `<div><h3 class="QJPWVe">Technical Product Manager, Google Ads</h3>
       <p class="l103df">Google | <span class="pwO9Dc"><span class="r0wTof ">Dublin, Ireland</span><span class="r0wTof p3oCrc">; Zurich, Switzerland</span></span></p>

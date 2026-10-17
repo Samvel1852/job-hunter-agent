@@ -72,11 +72,15 @@ The schedule fires automatically under `npx bdk serve` (production mode) and on 
 The final reply links the review page (`/v1/artifacts/<id>/content`); locally it is also written to
 the project state directory under `files/deployment/digests/<date>.html`. Open it in a browser:
 
+- **View posting** opens the job listing.
+- **Apply by email** opens Gmail as sam.demirtshyan@gmail.com, addressed to the employer, with
+  the cover letter and the Canva CV link already in the message. Press Send to deliver it.
+- **Apply on company site** opens the employer's own form, opens the Canva CV, and copies the
+  cover letter so it can be pasted in.
+- **Apply on listing** is used when the posting has no employer email and no separate form
+  (for example LinkedIn Easy Apply). It opens that listing and the Canva CV, and copies the
+  cover letter. The final submit on that site stays with you.
 - **Download CV (PDF)** opens the tailored CV and the print dialog (save as PDF).
-- **Apply** opens the application page, copies the cover letter and marks the job as applied.
-
-Job boards don't allow third-party submission, so the final submit on the employer's page stays
-with you.
 
 ## Develop
 

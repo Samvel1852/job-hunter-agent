@@ -13,7 +13,8 @@ Return one JSON object with exactly these fields, ready for `save_application`:
     "location": "",
     "region": "",
     "url": "",
-    "applyUrl": ""
+    "applyUrl": "",
+    "employerEmail": ""
   },
   "fitScore": 0,
   "fitReasons": [],
@@ -47,5 +48,9 @@ Return one JSON object with exactly these fields, ready for `save_application`:
 - **coverLetter**: follow the `human` skill. At most two paragraphs of plain text. Open with
   this company and role, give one proof from the CV, and end the second paragraph with
   Samvel Demirtshyan. No third paragraph, no invented facts.
+- **job.employerEmail**: copy it only when the posting itself shows a hiring email. Leave it
+  empty otherwise. Do not invent one.
+- **job.applyUrl**: the company's own application form when the posting links to one. Leave
+  it empty when the only link is the job-board listing.
 - Write in the posting's language only if it is not English and the CV shows that language.
   Otherwise write in English.
