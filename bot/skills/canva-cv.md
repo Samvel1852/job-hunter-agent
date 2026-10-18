@@ -29,7 +29,8 @@ Never edit the master design in place.
      `Technical Product Owner`. Use Owner when the posting is a Product Owner role, otherwise
      Manager. Do not add themes, companies, or extra words.
    - Professional summary: the same length as the master summary (350 characters, two
-     sentences). Reword toward the role using only master-CV facts. If the new text would
+     sentences). Reword toward the role using only master-CV facts, and keep it general:
+     no percentages, feature names, or a specific result. If the new text would
      grow the box or cover the experience section, shorten it until it fits, or cancel.
    Commit the edit transaction only when the preview still matches the frame. Cancel it if
    any step fails or the layout moves.

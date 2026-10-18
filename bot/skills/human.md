@@ -11,8 +11,9 @@ summary and the cover letter both go through this pass. Facts stay inside the ma
 
 - Two sentences, exactly 350 characters, so the one-page Canva frame still fits.
 - No "I". It is a CV summary, written the way a person describes work they actually did.
-- Lead with the part of Samvel's experience that matters for this posting.
-- Prefer one concrete detail from the CV over a general claim.
+- Keep it general. Do not put percentages, feature names, or a specific result in the summary. Those stay in the experience bullets.
+- Sentence one: software engineering background, then the skills that match this posting, such as customer research, product analytics, backlog prioritization, requirements, and cross-functional delivery.
+- Sentence two: analytical and technical thinking, a customer-focused approach, and measurable product improvement. No case study.
 
 ## Cover letter
 

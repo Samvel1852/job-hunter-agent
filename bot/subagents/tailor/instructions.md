@@ -38,9 +38,10 @@ Return one JSON object with exactly these fields, ready for `save_application`:
 - **headline**: exactly `Technical Product Manager` or `Technical Product Owner`. Use Owner
   when the posting is a Product Owner role, otherwise Manager. No extra words.
 - **summary**: follow the `human` skill. Two sentences, exactly 350 characters (the master
-  Canva summary length), no "I". Sound like a person describing real work, not a brochure.
-  Lead with the experience most relevant to this posting and keep every fact inside the
-  master CV. This length is what fits the one-page Canva frame.
+  Canva summary length), no "I". Keep it general: background and the skills that match
+  the posting, then how he works. Do not put percentages, feature names, or a specific
+  result in the summary. Those stay in the experience bullets. Every claim stays inside
+  the master CV. This length is what fits the one-page Canva frame.
 - **cvMarkdown**: the full CV in Markdown, starting with `# Samvel Demirtshyan`, then the new
   headline, contact line, `## Professional Summary` with the new summary, then the CV's
   sections. Reorder skills and bullets so the posting's must-haves surface first and mirror
