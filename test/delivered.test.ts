@@ -24,6 +24,13 @@ describe('delivered ledger', () => {
     );
     const seen = await wasDelivered(emptyKv, 'other:1', 'optimum partners|technical product owner', file);
     assert.equal(seen?.jobId, 'staffam:166149');
+    const renamed = await wasDelivered(
+      emptyKv,
+      'linkedin:999',
+      'optimum partners|product owner',
+      file,
+    );
+    assert.equal(renamed?.jobId, 'staffam:166149');
     assert.deepEqual(await dayJobIds(emptyKv, '2026-10-17', file), ['staffam:166149']);
     assert.deepEqual(await dayJobIds(emptyKv, '2026-10-18', file), []);
   });

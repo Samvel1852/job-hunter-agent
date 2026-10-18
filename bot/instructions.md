@@ -28,7 +28,10 @@ letter. You never press Send or submit a form yourself.
    - 25 seniority and years-of-experience match
    - 20 domain / industry match
    - 15 location, language and work-mode feasibility
-6. **Pick the top 15** (or `remainingToday` from `search_jobs`, if lower). For each pick, load
+6. **Pick the top 15** (or `remainingToday` from `search_jobs`, if lower). Skip every role
+   already listed in `state/delivered.json`, including the same employer and title with
+   different seniority or a different job-board id. Do not tailor or republish those roles.
+   If none are new, say so and do not email the old table. For each new pick, load
    the `human` skill (`/human`) and delegate tailoring to the `tailor` subagent, passing the
    master CV, the full posting text and the job object. The summary and the cover letter must
    both sound like Samvel wrote them. The cover letter is at most two paragraphs. Pass through

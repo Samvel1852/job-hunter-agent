@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { googleCareersApplyUrl, parseGoogleCareersSearch } from '../bot/lib/sources/googleCareers.js';
 import type { Region } from '../bot/lib/config.js';
-import { fingerprint, interleaveByRegion, isProductRole } from '../bot/lib/sources/index.js';
+import { fingerprint, interleaveByRegion, isProductRole, sameOpening } from '../bot/lib/sources/index.js';
 import {
   linkedinSearchUrl,
   parseLinkedinPosting,
@@ -178,6 +178,27 @@ describe('filters', () => {
     assert.equal(
       fingerprint({ company: 'Acme, Inc.', title: 'Senior Product Manager – Growth' }),
       fingerprint({ company: 'ACME Inc', title: 'Senior Product Manager - Growth' }),
+    );
+    assert.equal(
+      sameOpening(
+        'optimum partners armenia|technical product owner',
+        fingerprint({ company: 'Optimum Partners', title: 'Product Owner' }),
+      ),
+      true,
+    );
+    assert.equal(
+      sameOpening(
+        fingerprint({ company: 'Tabby', title: 'Senior Product Manager' }),
+        fingerprint({ company: 'Tabby | تابي', title: 'Product Manager' }),
+      ),
+      true,
+    );
+    assert.equal(
+      sameOpening(
+        fingerprint({ company: 'Blend', title: 'Product Manager' }),
+        fingerprint({ company: 'BurjX', title: 'Product Manager' }),
+      ),
+      false,
     );
   });
 

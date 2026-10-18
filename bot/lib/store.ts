@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { HostKvApi } from '@cursor/bdk';
 import { CANDIDATE } from './config.js';
+import { sameOpening } from './sources/index.js';
 
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -84,7 +85,11 @@ export async function wasDelivered(
   const byFp = (await kv.get(keys.seenFingerprint(fp))) as SeenRecord | undefined;
   if (byFp) return byFp;
   const jobs = await readDelivered(file);
-  return jobs.find((job) => job.jobId === jobId || (job.fingerprint !== undefined && job.fingerprint === fp));
+  return jobs.find(
+    (job) =>
+      job.jobId === jobId ||
+      (job.fingerprint !== undefined && (job.fingerprint === fp || sameOpening(job.fingerprint, fp))),
+  );
 }
 
 export async function dayJobIds(kv: HostKvApi, date: string, file = deliveredFile): Promise<string[]> {

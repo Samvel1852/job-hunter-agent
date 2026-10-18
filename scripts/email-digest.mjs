@@ -32,20 +32,36 @@ function decode(value) {
     .replace(/&#39;/g, "'");
 }
 
+function roleKey(company, title) {
+  const clean = (value) =>
+    value
+      .toLowerCase()
+      .replace(/\b(inc|incorporated|llc|ltd|limited|gmbh|group|holding|holdings|armenia|senior|sr|junior|jr|lead)\b/g, ' ')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  return `${clean(company)}|${clean(title)}`;
+}
+
 function parseDigest(html) {
   const date = /<h1>.*?·\s*(\d{4}-\d{2}-\d{2})<\/h1>/.exec(html)?.[1];
-  const jobs = html
-    .split('<article')
-    .slice(1)
-    .map((block) => {
-      const title = decode(/<h2>(.*?)<\/h2>/.exec(block)?.[1] ?? '');
-      const meta = decode(/<div class="meta">(.*?)<\/div>/.exec(block)?.[1] ?? '');
-      const [company, location] = meta.split(' · ').map((part) => part.trim());
-      const source = /<span class="badge">(.*?)<\/span>/.exec(block)?.[1] ?? '';
-      const score = /<div class="score">(\d+)%/.exec(block)?.[1] ?? '';
-      return { title, company: company ?? '', location: location ?? '', source, score };
-    })
-    .filter((job) => job.title !== '');
+  const seenIds = new Set();
+  const seenRoles = new Set();
+  const jobs = [];
+  for (const block of html.split('<article').slice(1)) {
+    const id = /data-job="([^"]+)"/.exec(block)?.[1] ?? '';
+    const title = decode(/<h2>(.*?)<\/h2>/.exec(block)?.[1] ?? '');
+    const meta = decode(/<div class="meta">(.*?)<\/div>/.exec(block)?.[1] ?? '');
+    const [company, location] = meta.split(' · ').map((part) => part.trim());
+    const source = /<span class="badge">(.*?)<\/span>/.exec(block)?.[1] ?? '';
+    const score = /<div class="score">(\d+)%/.exec(block)?.[1] ?? '';
+    if (!title) continue;
+    const role = roleKey(company ?? '', title);
+    if ((id && seenIds.has(id)) || seenRoles.has(role)) continue;
+    if (id) seenIds.add(id);
+    seenRoles.add(role);
+    jobs.push({ id, title, company: company ?? '', location: location ?? '', source, score });
+  }
   return { date, jobs };
 }
 

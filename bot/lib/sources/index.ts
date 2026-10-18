@@ -108,13 +108,32 @@ export function isProductRole(title: string): boolean {
   return TITLE_INCLUDE.test(title) && !TITLE_EXCLUDE.test(title);
 }
 
+const COMPANY_NOISE =
+  /\b(inc|incorporated|llc|ltd|limited|gmbh|ag|sa|plc|corp|corporation|company|co|group|holding|holdings|the|armenia)\b/g;
+const TITLE_NOISE =
+  /\b(senior|sr|junior|jr|lead|principal|staff|associate|mid|level|technical|tech|i{1,3})\b/g;
+
+function normalizeOpening(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
 export function fingerprint(job: Pick<JobPosting, 'company' | 'title'>): string {
-  const normalize = (value: string) =>
-    value
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, ' ')
-      .trim();
-  return `${normalize(job.company)}|${normalize(job.title)}`;
+  return `${normalizeOpening(job.company)}|${normalizeOpening(job.title)}`;
+}
+
+/** Same employer and the same role, ignoring seniority, legal suffixes, and punctuation. */
+export function sameOpening(left: string, right: string): boolean {
+  const loosen = (fp: string) => {
+    const [company, ...rest] = fp.split('|');
+    const title = rest.join('|');
+    const companyKey = normalizeOpening(company ?? '').replace(COMPANY_NOISE, ' ').replace(/\s+/g, ' ').trim();
+    const titleKey = normalizeOpening(title).replace(TITLE_NOISE, ' ').replace(/\s+/g, ' ').trim();
+    return `${companyKey}|${titleKey}`;
+  };
+  return loosen(left) === loosen(right);
 }
 
 export async function collectJobs(options: {
@@ -136,7 +155,8 @@ export async function collectJobs(options: {
     for (const job of result.value) {
       if (!job.url || !isProductRole(job.title)) continue;
       const key = fingerprint(job);
-      if (!byKey.has(key)) byKey.set(key, job);
+      const already = [...byKey.keys()].some((existing) => sameOpening(existing, key));
+      if (!already) byKey.set(key, job);
     }
   });
 
