@@ -28,7 +28,7 @@ export default defineTool({
     cvMarkdown: z.string().min(400),
     coverLetter: z
       .string()
-      .refine(isShortCoverLetter, 'Cover letter must be 1 or 2 paragraphs (80–1800 characters).'),
+      .refine(isShortCoverLetter, 'Cover letter must be the short note: Dear Hiring Team, three paragraphs, Best regards, Samvel Demirtshyan.'),
     canvaUrl: z.string().url().optional(),
   }),
   effect: 'write',

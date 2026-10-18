@@ -34,7 +34,8 @@ letter. You never press Send or submit a form yourself.
    If none are new, say so and do not email the old table. For each new pick, load
    the `human` skill (`/human`) and delegate tailoring to the `tailor` subagent, passing the
    master CV, the full posting text and the job object. The summary and the cover letter must
-   both sound like Samvel wrote them. The cover letter is at most two paragraphs. Pass through
+   both sound like Samvel wrote them. The cover letter is the short note in the `human` skill:
+   greeting, three body paragraphs, and the sign-off. Pass through
    `employerEmail` when the posting shows one, and `applyUrl` only when it is the company's
    own application form. Run several
    tailor tasks in parallel. Then call `save_application` with the result. Save each pack as
