@@ -167,11 +167,6 @@
     },
     {
       "date": "2026-10-19",
-      "jobId": "linkedin:4480990986",
-      "fingerprint": "tabby|senior product manager card billing statements"
-    },
-    {
-      "date": "2026-10-19",
       "jobId": "linkedin:4478433431",
       "fingerprint": "next ventures|product manager trading platform rules risk"
     },
@@ -224,6 +219,11 @@
       "date": "2026-10-19",
       "jobId": "linkedin:4480128161",
       "fingerprint": "revun|senior technical product manager"
+    },
+    {
+      "date": "2026-10-19",
+      "jobId": "linkedin:4480186785",
+      "fingerprint": "tether io|product manager on ramp swap 100 remote"
     }
   ]
 }
