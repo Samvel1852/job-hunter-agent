@@ -10,6 +10,8 @@ export type JobPosting = {
   url: string;
   postedAt?: string;
   snippet?: string;
+  /** Present when the posting itself states a hiring address. */
+  employerEmail?: string;
 };
 
 export function classifyRegion(location: string, fallback: Region): Region {

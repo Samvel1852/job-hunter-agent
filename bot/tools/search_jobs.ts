@@ -12,8 +12,10 @@ export default defineTool({
   description: prompt`
     Search LinkedIn, staff.am, Google Careers, Google Jobs (when SERPAPI_API_KEY is set),
     Remotive, Himalayas and RemoteOK for Product Manager / Product Owner roles in Armenia, the EU,
-    the US, the UAE and remote. Results are already filtered to product titles and exclude every
-    job delivered on a previous day, so anything returned is safe to propose.
+    the US, the UAE and remote. RemoteOK listings are included only when the posting states a
+    hiring email, because RemoteOK's own Apply button requires a paid account. Results are
+    already filtered to product titles and exclude every job delivered on a previous day, so
+    anything returned is safe to propose.
   `,
   inputSchema: z.object({
     regions: z.array(z.enum(ALL_REGIONS as [string, ...string[]])).optional(),

@@ -21,7 +21,8 @@ one-click **Apply** button.
 | staff.am                            | Armenia                            |
 | Google Careers                      | EU (DE, IE, NL, PL, CH), US, Dubai |
 | Google Jobs (via SerpAPI, optional) | Armenia, EU, US, UAE               |
-| Himalayas, RemoteOK, Remotive       | Remote                             |
+| Himalayas, Remotive                 | Remote                             |
+| RemoteOK                            | Remote, only with a stated hiring email. RemoteOK Apply is paid. |
 
 Search keywords, LinkedIn geo IDs, Google Careers locations, the title filter and the daily limit
 live in `bot/lib/config.ts`.

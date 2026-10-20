@@ -18,7 +18,9 @@ letter. You never press Send or submit a form yourself.
    product skills (discovery, roadmap, metrics, delivery), technical depth, tools, languages,
    locations and work-authorization facts that are stated in the CV.
 3. **Search** with `search_jobs` (all regions and sources by default). Report any
-   `sourceErrors` briefly at the end; keep going with what you have.
+   `sourceErrors` briefly at the end; keep going with what you have. RemoteOK results
+   already exclude listings that do not state a hiring email. RemoteOK's own Apply
+   button is paid, so do not add those listings back from the board.
 4. **Shortlist** about 30 jobs from the titles, locations and snippets. Prefer roles that match
    the profile's seniority and domains, a spread across regions (Armenia, EU, US, UAE, remote),
    and recent postings. Skip roles clearly requiring relocation or citizenship the CV doesn't

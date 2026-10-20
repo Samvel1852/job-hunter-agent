@@ -9,6 +9,7 @@ import {
   parseLinkedinSearch,
 } from '../bot/lib/sources/linkedin.js';
 import { parseStaffamPosting, parseStaffamSearch, staffamCompanyApplyUrl } from '../bot/lib/sources/staffam.js';
+import { remoteOkPosting } from '../bot/lib/sources/remoteBoards.js';
 import { classifyRegion } from '../bot/lib/sources/types.js';
 
 const linkedinCard = `<li>
@@ -143,6 +144,48 @@ describe('google careers', () => {
         url: 'https://www.google.com/about/careers/applications/jobs/results/129175929833300678',
       },
     ]);
+  });
+});
+
+describe('remoteok', () => {
+  it('keeps a posting when the description states a hiring email', () => {
+    const posting = remoteOkPosting({
+      id: '1',
+      position: 'Product Manager',
+      company: 'Acme',
+      location: 'Worldwide',
+      url: 'https://remoteok.com/remote-jobs/remote-product-manager-acme-1',
+      date: '2026-10-18',
+      description: '<p>Send your CV to jobs&#64;acme.com.</p>',
+      apply_url: 'https://remoteok.com/remote-jobs/remote-product-manager-acme-1',
+    });
+    assert.equal(posting?.id, 'remoteok:1');
+    assert.equal(posting?.employerEmail, 'jobs@acme.com');
+    assert.equal(posting?.source, 'remoteok');
+  });
+
+  it('drops a posting that can only be opened through paid RemoteOK Apply', () => {
+    assert.equal(
+      remoteOkPosting({
+        id: '2',
+        position: 'Senior Product Manager',
+        company: 'Distru',
+        url: 'https://remoteok.com/remote-jobs/remote-senior-product-manager-distru-2',
+        description: '<p>Apply on this page. Powering trade for the cannabis industry.</p>',
+        apply_url: 'https://remoteok.com/remote-jobs/remote-senior-product-manager-distru-2',
+      }),
+      undefined,
+    );
+    assert.equal(
+      remoteOkPosting({
+        id: '3',
+        position: 'Product Manager',
+        company: 'Board',
+        url: 'https://remoteok.com/remote-jobs/remote-product-manager-board-3',
+        description: '<p>Questions: jobs@remoteok.com</p>',
+      }),
+      undefined,
+    );
   });
 });
 

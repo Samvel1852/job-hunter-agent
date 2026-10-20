@@ -6,7 +6,9 @@ Run today's job hunt (23:00 Yerevan time). Follow the "Daily run" workflow in yo
 end to end: load the master CV, search every source and region, pick the 15 best-fit roles that
 were never delivered before, save a tailored application pack for each, then publish the digest.
 Never include a role already in `state/delivered.json`, even when the title or job-board id
-differs slightly. If there are no new roles, stop without emailing the previous table.
+differs slightly. Skip every RemoteOK listing that does not state a hiring email. Applying
+on RemoteOK itself requires a paid account, so those roles are not free to apply. If there
+are no new roles, stop without emailing the previous table.
 On every pack, load the `human` skill and write a human summary plus the short cover letter
 from that skill: greeting, three body paragraphs, and the sign-off.
 On each Canva copy, keep the master frame on one page. Set the headline to exactly "Technical

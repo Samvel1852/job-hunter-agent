@@ -1,4 +1,5 @@
-import { cleanInline, fetchJson } from '../http.js';
+import { extractEmployerEmail } from '../apply.js';
+import { cleanInline, fetchJson, htmlToText } from '../http.js';
 import { classifyRegion, type JobPosting } from './types.js';
 
 const SNIPPET_LENGTH = 400;
@@ -66,7 +67,7 @@ export async function searchHimalayas(query: string): Promise<JobPosting[]> {
   });
 }
 
-type RemoteOkJob = {
+export type RemoteOkJob = {
   id?: string;
   position?: string;
   company?: string;
@@ -74,23 +75,37 @@ type RemoteOkJob = {
   url?: string;
   date?: string;
   description?: string;
+  apply_url?: string;
 };
+
+/**
+ * RemoteOK's Apply button requires a paid account. Keep the posting only when
+ * it clearly states a hiring email, which can be used without paying.
+ */
+export function remoteOkPosting(job: RemoteOkJob): JobPosting | undefined {
+  if (!job.id || !job.position || !job.url) return undefined;
+  const employerEmail = extractEmployerEmail(htmlToText(job.description ?? ''));
+  if (!employerEmail) return undefined;
+  return {
+    id: `remoteok:${job.id}`,
+    source: 'remoteok',
+    title: cleanInline(job.position),
+    company: job.company ?? '',
+    location: `Remote${job.location ? ` (${job.location})` : ''}`,
+    region: classifyRegion(job.location ?? '', 'remote'),
+    url: job.url,
+    postedAt: job.date,
+    snippet: snippet(job.description),
+    employerEmail,
+  };
+}
 
 export async function searchRemoteOk(tag: string): Promise<JobPosting[]> {
   const data = await fetchJson<RemoteOkJob[]>(
     `https://remoteok.com/api?tag=${encodeURIComponent(tag)}`,
   );
-  return data
-    .filter((job) => job.id && job.position && job.url)
-    .map((job) => ({
-      id: `remoteok:${job.id}`,
-      source: 'remoteok',
-      title: cleanInline(job.position ?? ''),
-      company: job.company ?? '',
-      location: `Remote${job.location ? ` (${job.location})` : ''}`,
-      region: classifyRegion(job.location ?? '', 'remote'),
-      url: job.url ?? '',
-      postedAt: job.date,
-      snippet: snippet(job.description),
-    }));
+  return data.flatMap((job) => {
+    const posting = remoteOkPosting(job);
+    return posting ? [posting] : [];
+  });
 }
