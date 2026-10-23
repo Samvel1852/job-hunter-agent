@@ -462,8 +462,18 @@
     },
     {
       "date": "2026-10-23",
-      "jobId": "linkedin:4480625170",
-      "fingerprint": "ehealth|product manager"
+      "jobId": "staffam:166522",
+      "fingerprint": "fast bank cjsc|loans product owner retail banking"
+    },
+    {
+      "date": "2026-10-23",
+      "jobId": "linkedin:4463468825",
+      "fingerprint": "intermedia intelligent communications|senior product manager integration builder"
+    },
+    {
+      "date": "2026-10-23",
+      "jobId": "staffam:166521",
+      "fingerprint": "fast bank cjsc|deposits product owner retail banking"
     },
     {
       "date": "2026-10-23",
@@ -472,18 +482,8 @@
     },
     {
       "date": "2026-10-23",
-      "jobId": "linkedin:4463468825",
-      "fingerprint": "intermedia intelligent communications|product manager integration builder"
-    },
-    {
-      "date": "2026-10-23",
-      "jobId": "staffam:166522",
-      "fingerprint": "fast bank cjsc|loans product owner retail banking"
-    },
-    {
-      "date": "2026-10-23",
-      "jobId": "staffam:166521",
-      "fingerprint": "fast bank cjsc|deposits product owner retail banking"
+      "jobId": "linkedin:4480625170",
+      "fingerprint": "ehealth armenia|product manager"
     },
     {
       "date": "2026-10-23",
@@ -493,7 +493,7 @@
     {
       "date": "2026-10-23",
       "jobId": "linkedin:4481768168",
-      "fingerprint": "fervo energy|technical product manager internal software"
+      "fingerprint": "fervo energy|senior technical product manager internal software"
     },
     {
       "date": "2026-10-23",
@@ -508,12 +508,12 @@
     {
       "date": "2026-10-23",
       "jobId": "linkedin:4482890468",
-      "fingerprint": "tabby|product manager p2p and local transfers"
+      "fingerprint": "tabby|senior product manager p2p and local transfers"
     },
     {
       "date": "2026-10-23",
       "jobId": "linkedin:4430620788",
-      "fingerprint": "nextera energy|product manager i nea"
+      "fingerprint": "nextera energy inc|sr product manager i nea"
     },
     {
       "date": "2026-10-23",
@@ -528,12 +528,12 @@
     {
       "date": "2026-10-23",
       "jobId": "linkedin:4480233385",
-      "fingerprint": "pantherx rare pharmacy|product owner it"
+      "fingerprint": "pantherx rare pharmacy|senior product owner it"
     },
     {
       "date": "2026-10-23",
       "jobId": "linkedin:4480262698",
-      "fingerprint": "capital com|product owner financial investigation unit"
+      "fingerprint": "capital com|senior product owner financial investigation unit"
     }
   ]
 }
