@@ -5,7 +5,7 @@ description: Use when the master CV must be imported from Canva, or to create a 
 # Canva CV
 
 The master CV is the Canva design `DAHYNhleQV4`
-(https://www.canva.com/design/DAHYNhleQV4/htPca5hyr4h524p9R2tLaQ/edit). Canva tools come from
+(https://www.canva.com/design/DAHY5ieCsr0/kNzpkXk1gFmBp511YCUMUA/edit?ui=e30). Canva tools come from
 the Cursor account connector and are advertised by name (they usually contain `design`,
 `editing` or `export`). If no Canva tools are available, say so and fall back to the Markdown CV.
 
