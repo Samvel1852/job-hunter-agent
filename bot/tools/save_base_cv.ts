@@ -1,5 +1,6 @@
 import { defineTool } from '@cursor/bdk/tools';
 import { z } from 'zod';
+import { CANDIDATE } from '../lib/config.js';
 import { keys } from '../lib/store.js';
 
 export default defineTool({
@@ -12,7 +13,13 @@ export default defineTool({
   effect: 'write',
   async execute({ markdown, source }, ctx) {
     const updatedAt = new Date().toISOString();
-    await ctx.host.kv.put(keys.baseCv, { markdown, source, updatedAt });
-    return { saved: true, source, updatedAt, characters: markdown.length };
+    const canvaDesignId = source === 'canva' ? CANDIDATE.canvaDesignId : undefined;
+    await ctx.host.kv.put(keys.baseCv, {
+      markdown,
+      source,
+      updatedAt,
+      ...(canvaDesignId ? { canvaDesignId } : {}),
+    });
+    return { saved: true, source, updatedAt, canvaDesignId, characters: markdown.length };
   },
 });

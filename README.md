@@ -29,7 +29,7 @@ live in `bot/lib/config.ts`.
 
 ## How a daily run works
 
-1. `get_base_cv` loads the master CV (from Canva on first run, then cached).
+1. `get_base_cv` loads the master CV from the current Canva design, and re-reads it when that design changes.
 2. `search_jobs` queries every source, keeps only product titles, removes duplicates across
    boards and everything delivered before.
 3. The agent shortlists ~30 jobs, reads each with `get_job_details` and scores fit.

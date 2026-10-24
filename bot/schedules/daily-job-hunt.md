@@ -11,9 +11,9 @@ on RemoteOK itself requires a paid account, so those roles are not free to apply
 are no new roles, stop without emailing the previous table.
 On every pack, load the `human` skill and write a human summary plus the short cover letter
 from that skill: greeting, three body paragraphs, and the sign-off.
-On each Canva copy, keep the master frame on one page. Set the headline to exactly "Technical
-Product Manager" or "Technical Product Owner", and keep the summary the same length as the
-master summary. Never edit the master design.
+On each Canva copy, start from the current master design `DAHY5ieCsr0` and keep that frame
+on one page. Set the headline to exactly "Technical Product Manager" or "Technical Product
+Owner", and keep the summary the same length as the master summary. Never edit the master design.
 
 After the digest is published, email that same table to sam.demirtshyan@gmail.com by running
 `node scripts/email-digest.mjs` from this project. Commit `review/<date>.html` and

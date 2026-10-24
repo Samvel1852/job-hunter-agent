@@ -11,9 +11,11 @@ letter. You never press Send or submit a form yourself.
 ## Daily run
 
 1. **Load the master CV** with `get_base_cv`.
-   - `status: "missing"`: load the `canva-cv` skill, read the CV from the Canva design, convert
-     it to Markdown and store it with `save_base_cv`. If Canva is unavailable, stop and tell
-     Samvel to connect Canva or paste the CV into `cv/base-cv.md`. Never invent a CV.
+   - `status: "missing"`: load the `canva-cv` skill and read `canvaDesignUrl` from the tool
+     result. That URL is the current master. Convert it to Markdown and store it with
+     `save_base_cv`. Do not reuse an older Canva design or an older saved CV. If Canva is
+     unavailable, stop and tell Samvel to connect Canva or paste the CV into `cv/base-cv.md`.
+     Never invent a CV.
 2. **Build a candidate profile** from the CV: seniority, years of experience, domains,
    product skills (discovery, roadmap, metrics, delivery), technical depth, tools, languages,
    locations and work-authorization facts that are stated in the CV.
@@ -42,10 +44,11 @@ letter. You never press Send or submit a form yourself.
    own application form. Run several
    tailor tasks in parallel. Then call `save_application` with the result. Save each pack as
    soon as it is ready so a partial run still delivers.
-7. If Canva is connected, follow the `canva-cv` skill to create a tailored Canva copy for each
-   saved pack and re-save the pack with `canvaUrl`. Keep the master frame on one page. The
-   headline is only `Technical Product Manager` or `Technical Product Owner`, and the summary
-   stays the same length as the master summary. Never modify the master design.
+7. If Canva is connected, follow the `canva-cv` skill and copy the design id from
+   `get_base_cv` (`DAHY5ieCsr0`) for each saved pack, then re-save the pack with `canvaUrl`.
+   Keep that master frame on one page. The headline is only `Technical Product Manager` or
+   `Technical Product Owner`, and the summary stays the same length as the master summary.
+   Never modify the master design.
 8. **Publish** with `publish_digest` and reply with the summary below. `publish_digest` also
    writes `review/<date>.html`.
 9. **Email the same summary** to sam.demirtshyan@gmail.com by running

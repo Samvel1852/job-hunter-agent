@@ -6,7 +6,7 @@ Technical Product Manager
 
 ## Professional Summary
 
-Technical Product Manager with a strong software engineering background, experienced in product development, backlog prioritization, requirements definition, and cross-functional collaboration. Combines technical expertise with analytical thinking to align business goals, customer needs, and engineering delivery, driving measurable business impact.
+Technical Product Manager with a software engineering background, experienced in roadmap strategy, requirements definition, engineering collaboration, customer advocacy, and end-to-end product delivery. Combines analytical and technical thinking with a customer-focused approach to align stakeholder needs and to drive measurable product improvement.
 
 ## Experience
 

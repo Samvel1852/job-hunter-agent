@@ -4,14 +4,14 @@ description: Use when the master CV must be imported from Canva, or to create a 
 
 # Canva CV
 
-The master CV is the Canva design `DAHYNhleQV4`
+The master CV is the Canva design `DAHY5ieCsr0`
 (https://www.canva.com/design/DAHY5ieCsr0/kNzpkXk1gFmBp511YCUMUA/edit?ui=e30). Canva tools come from
 the Cursor account connector and are advertised by name (they usually contain `design`,
 `editing` or `export`). If no Canva tools are available, say so and fall back to the Markdown CV.
 
 ## Import the master CV
 
-1. Fetch the design's content (or search designs for "CV" / "Samvel" if fetching by id fails).
+1. Fetch this design by its URL. This is the only master. Do not open another CV design.
 2. Rebuild it as Markdown: `# Name`, headline line, contact line, then `##` sections
    (Professional Summary, Experience, Skills, Education, Certifications, Languages) with
    `-` bullets. Keep every fact and number exactly as written.
@@ -40,8 +40,9 @@ touch the next one, shorten the text. Never close the gap by sliding the lower g
 
 Never edit the master design in place.
 
-1. Create a copy of the master design named `CV - <Company> - <Job title>`. If the connector
-   cannot copy designs, skip Canva tailoring for this run and leave `canvaUrl` empty.
+1. Create a copy of design `DAHY5ieCsr0` named `CV - <Company> - <Job title>`. The page
+   structure, groups, and spacing come from that copy. If the connector cannot copy designs,
+   skip Canva tailoring for this run and leave `canvaUrl` empty.
 2. In the copy, replace only two text elements. Keep the master frame: same fonts, positions,
    sizes, groups, and every other element. The result must stay on one page with nothing overlapping.
    - Headline (the line under the name): exactly `Technical Product Manager` or

@@ -36,7 +36,12 @@ export type SeenRecord = { date: string; jobId: string; fingerprint?: string };
 export const deliveredFile = join(projectRoot, 'state/delivered.json');
 export const reviewDir = join(projectRoot, 'review');
 
-export type BaseCv = { markdown: string; source: string; updatedAt: string };
+export type BaseCv = {
+  markdown: string;
+  source: string;
+  updatedAt: string;
+  canvaDesignId?: string;
+};
 
 export const keys = {
   baseCv: 'cv:base',
