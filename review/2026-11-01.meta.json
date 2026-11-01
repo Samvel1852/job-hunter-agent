@@ -1,0 +1,7 @@
+{
+  "date": "2026-11-01",
+  "sourceErrors": [
+    "himalayas: 403 Forbidden while reading several job pages",
+    "linkedin: 429 Too Many Requests on a subset of Armenia/US queries"
+  ]
+}

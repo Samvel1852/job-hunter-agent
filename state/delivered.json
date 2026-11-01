@@ -1197,18 +1197,18 @@
     },
     {
       "date": "2026-11-01",
-      "jobId": "staffam:technical-project-manager-vbet",
-      "fingerprint": "softconstruct|technical project manager vbet"
-    },
-    {
-      "date": "2026-11-01",
       "jobId": "linkedin:4440268280",
       "fingerprint": "google|senior product manager databases analytics google cloud"
     },
     {
       "date": "2026-11-01",
-      "jobId": "himalayas:https://himalayas.app/companies/bjak/jobs/product-owner-technical-ai-investing-app",
-      "fingerprint": "bjak|product owner technical ai investing app"
+      "jobId": "linkedin:4467740609",
+      "fingerprint": "microsoft|senior technical product manager"
+    },
+    {
+      "date": "2026-11-01",
+      "jobId": "himalayas:https://himalayas.app/companies/jerry/jobs/senior-product-manager-emerging-products-0-1-4136729688",
+      "fingerprint": "jerry|senior product manager emerging products 0 1"
     }
   ]
 }
