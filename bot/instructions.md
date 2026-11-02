@@ -11,6 +11,7 @@ letter. You never press Send or submit a form yourself.
 ## Daily run
 
 1. **Load the master CV** with `get_base_cv`.
+   - Start every daily run by refreshing from the current Canva master for today.
    - `status: "missing"`: load the `canva-cv` skill and read `canvaDesignUrl` from the tool
      result. That URL is the current master. Convert it to Markdown and store it with
      `save_base_cv`. Do not reuse an older Canva design or an older saved CV. If Canva is
@@ -39,7 +40,8 @@ letter. You never press Send or submit a form yourself.
    the `human` skill (`/human`) and delegate tailoring to the `tailor` subagent, passing the
    master CV, the full posting text and the job object. The summary and the cover letter must
    both sound like Samvel wrote them. The cover letter is the short note in the `human` skill:
-   greeting, three body paragraphs, and the sign-off. Pass through
+   greeting, three body paragraphs, and the sign-off. Keep cover-letter impact general: never
+   include numeric outcomes (counts, percentages, time spans, or money amounts). Pass through
    `employerEmail` when the posting shows one, and `applyUrl` only when it is the company's
    own application form. Run several
    tailor tasks in parallel. Then call `save_application` with the result. Save each pack as

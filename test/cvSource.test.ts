@@ -4,11 +4,15 @@ import { CANDIDATE } from '../bot/lib/config.js';
 import { resolveBaseCv } from '../bot/lib/cvSource.js';
 
 describe('master CV source', () => {
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+
   it('asks for a fresh Canva read when the saved CV is from an older design', () => {
     const result = resolveBaseCv({
       markdown: '# Samvel Demirtshyan\n\nOld layout.',
       source: 'canva',
-      updatedAt: '2026-10-17T00:00:00.000Z',
+      updatedAt: yesterday.toISOString(),
       canvaDesignId: 'DAHYNhleQV4',
     });
     assert.equal(result.status, 'missing');
@@ -16,11 +20,21 @@ describe('master CV source', () => {
     assert.match(result.canvaDesignUrl, /DAHY5ieCsr0/);
   });
 
-  it('reuses the CV only after it was imported from the current master', () => {
+  it('asks for a fresh Canva read when the current design was not refreshed today', () => {
+    const result = resolveBaseCv({
+      markdown: '# Samvel Demirtshyan\n\nYesterday copy.',
+      source: 'canva',
+      updatedAt: yesterday.toISOString(),
+      canvaDesignId: CANDIDATE.canvaDesignId,
+    });
+    assert.equal(result.status, 'missing');
+  });
+
+  it('reuses the CV only after it was imported from the current master today', () => {
     const result = resolveBaseCv({
       markdown: '# Samvel Demirtshyan\n\nCurrent layout.',
       source: 'canva',
-      updatedAt: '2026-10-25T00:00:00.000Z',
+      updatedAt: now.toISOString(),
       canvaDesignId: CANDIDATE.canvaDesignId,
     });
     assert.equal(result.status, 'ok');

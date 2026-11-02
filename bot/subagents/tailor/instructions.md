@@ -47,8 +47,8 @@ Return one JSON object with exactly these fields, ready for `save_application`:
   sections. Reorder skills and bullets so the posting's must-haves surface first and mirror
   its keywords where the CV supports them (ATS-friendly). Keep every role, date and employer.
 - **coverLetter**: follow the `human` skill. Greeting, three short body paragraphs, and
-  the sign-off. No fourth paragraph and no invented facts. The 12% and 7% results go
-  only in the second paragraph.
+  the sign-off. No fourth paragraph and no invented facts. Keep impact general and do not
+  include numeric outcomes (counts, percentages, time spans, or money amounts).
 - **job.employerEmail**: copy it only when the posting itself shows a hiring email. Leave it
   empty otherwise. Do not invent one.
 - **job.applyUrl**: the company's own application form when the posting links to one. Leave

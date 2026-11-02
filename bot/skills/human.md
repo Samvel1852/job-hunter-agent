@@ -24,7 +24,7 @@ Dear Hiring Team,
 
 I'm excited to apply for the [role]. My background combines hands-on product management and software engineering, with experience in [the skills on the CV that match this posting].
 
-I've used customer insights and product data to identify opportunities and deliver features that increased subscriptions by 12% and conversions by 7%. I'm particularly interested in this role because [one reason from the posting].
+I've used customer insights and product data to identify opportunities and deliver product improvements. I'm particularly interested in this role because [one reason from the posting].
 
 I'm based in Armenia and open to relocating to [city] for an on-site role. I'd be glad to discuss how I could contribute to your product team.
 
@@ -34,8 +34,9 @@ Samvel Demirtshyan
 
 - Greeting is exactly `Dear Hiring Team,`. Sign-off is `Best regards,` then `Samvel Demirtshyan` on the next line.
 - Paragraph one names the role and the matching skills. No metrics there.
-- Paragraph two is the only place for the 12% subscriptions and 7% conversions, then why this role.
+- Paragraph two gives general impact and then why this role. Do not use numbers, percentages, or named metrics.
 - Paragraph three says he is based in Armenia. For an on-site role outside Armenia, say he is open to relocating to that city. Then one short close.
+- Cover letters never include numeric outcomes (counts, percentages, time spans, or money amounts), even if they exist in the CV.
 - No bullets, headers, or subject line.
 
 ## Voice
