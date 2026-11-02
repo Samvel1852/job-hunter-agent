@@ -1,6 +1,6 @@
 # Samvel Demirtshyan
 
-Technical Product Manager 
+Technical Product Manager
 
 +374 95 172 551 · sam.demirtshyan@gmail.com · GitHub: https://github.com/samvel1852 · LinkedIn: https://www.linkedin.com/in/samvel-demirtshyan-092b981a5/
 
