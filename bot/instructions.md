@@ -11,7 +11,9 @@ letter. You never press Send or submit a form yourself.
 ## Daily run
 
 1. **Load the master CV** with `get_base_cv`.
-   - Start every daily run by refreshing from the current Canva master for today.
+   - Start every daily run by refreshing from the current Canva master `DAHZCxr0zlo`
+     before tailoring. Read `canvaDesignUrl` and store it with `save_base_cv` even when a
+     copy was already saved earlier today, so the hunt uses the latest version of this design.
    - `status: "missing"`: load the `canva-cv` skill and read `canvaDesignUrl` from the tool
      result. That URL is the current master. Convert it to Markdown and store it with
      `save_base_cv`. Do not reuse an older Canva design or an older saved CV. If Canva is
@@ -47,7 +49,7 @@ letter. You never press Send or submit a form yourself.
    tailor tasks in parallel. Then call `save_application` with the result. Save each pack as
    soon as it is ready so a partial run still delivers.
 7. If Canva is connected, follow the `canva-cv` skill and copy the design id from
-   `get_base_cv` (`DAHY5ieCsr0`) for each saved pack, then re-save the pack with `canvaUrl`.
+   `get_base_cv` (`DAHZCxr0zlo`) for each saved pack, then re-save the pack with `canvaUrl`.
    Keep that master frame on one page. The headline is only `Technical Product Manager` or
    `Technical Product Owner`, and the summary stays the same length as the master summary.
    Never modify the master design.

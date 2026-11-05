@@ -3,7 +3,7 @@ cron: '0 19 * * *'
 ---
 
 Run today's job hunt (23:00 Yerevan time). Follow the "Daily run" workflow in your instructions
-end to end: refresh and load the master CV from Canva first, search every source and region, pick the 15 best-fit roles that
+end to end: refresh and load the latest version of Canva master `DAHZCxr0zlo` before tailoring, search every source and region, pick the 15 best-fit roles that
 were never delivered before, save a tailored application pack for each, then publish the digest.
 Never include a role already in `state/delivered.json`, even when the title or job-board id
 differs slightly. Skip every RemoteOK listing that does not state a hiring email. Applying
@@ -13,7 +13,7 @@ On every pack, load the `human` skill and write a human summary plus the short c
 from that skill: greeting, three body paragraphs, and the sign-off.
 Never use numeric outcomes in cover letters (counts, percentages, time spans, or money amounts);
 describe impact in general terms only.
-On each Canva copy, start from the current master design `DAHY5ieCsr0` and keep that frame
+On each Canva copy, start from the current master design `DAHZCxr0zlo` and keep that frame
 on one page. Set the headline to exactly "Technical Product Manager" or "Technical Product
 Owner", and keep the summary the same length as the master summary. Never edit the master design.
 
