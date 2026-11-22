@@ -2,11 +2,11 @@
 
 Technical Product Manager
 
-+374 95 172 551 · sam.demirtshyan@gmail.com · GitHub: https://github.com/samvel1852 · LinkedIn: https://www.linkedin.com/in/samvel-demirtshyan-092b981a5/
++374 95 172 551 · sam.demirtshyan@gmail.com
 
 ## Professional Summary
 
-Technical Product Manager with a software engineering background, experienced in roadmap strategy, requirements definition, engineering collaboration, customer advocacy, and end-to-end product delivery. Combines analytical and technical thinking with a customer-focused approach to align stakeholder needs and to drive measurable product improvement.
+Technical Product Manager with a software engineering background and experience building digital products from discovery to launch. Skilled in product strategy, roadmaps, user research, requirements definition, analytics, and cross-functional delivery. Customer-focused and analytical, with a strong interest in improving user journeys, conversion, and product performance.
 
 ## Experience
 
@@ -19,7 +19,7 @@ Technical Product Manager with a software engineering background, experienced in
 
 ### NextStack LLC
 
-**Technical Product Manager / Full-Stack Engineer** · Apr 2025 – Feb 2026
+**Technical Product Manager / Full-Stack Engineer** · Sep 2024 – Feb 2026
 
 - Managed product development across Mobile, Backend, and Design teams.
 - Led user research, product solutions, and feature flows with Design.
@@ -27,13 +27,13 @@ Technical Product Manager with a software engineering background, experienced in
 - Identified NOTAMs as a paid feature, increasing monthly subscriptions by 12%.
 - Introduced parsed ATIS information, increasing conversions by 7%, and prioritized premium features using research, analytics, and monetization potential.
 
-**Full-Stack Engineer** · Sep 2024 – Apr 2025
+**Full-Stack Engineer** · Jan 2024 – Sep 2024
 
 - Owned frontend architecture across 4 web applications.
 - Designed and integrated backend APIs using Node.js / NestJS.
 - Delivered full-stack features from UI through API integration to production.
 
-**Frontend Engineer** · Aug 2022 – Sep 2024
+**Frontend Engineer** · Aug 2022 – Jan 2024
 
 - Established scalable frontend architecture and shared components across 6 production applications.
 - Delivered 50+ production features with end-to-end ownership.
@@ -50,29 +50,15 @@ Technical Product Manager with a software engineering background, experienced in
 
 ### National Survey for Seismic Protection, MES, RA
 
-**First guild master, simultaneously, an operator on duty.** · Jul 2012 – Sep 2015
+**First guild master/an operator on duty** · Jul 2012 – Sep 2015
 
 ## Technical Skills
 
-- Product: Discovery, Roadmapping, PRDs, Prioritization
-- Research: Interviews, Surveys, Competitor Research
-- Analytics: Product Analytics, A/B Testing, KPIs
-- Development: REST APIs, SQL, Databases
-- Web: Frontend Architecture, HTTP/HTTPS, Debugging
-- Technical: System Architecture, Requirements
-- Delivery: Agile/Scrum, Jira, Notion, Git
+Product: Discovery, Roadmapping, PRDs, Prioritization · Research: Interviews, Surveys, Competitor Research · Analytics: Product Analytics, A/B Testing, KPIs · Development: REST APIs, SQL, Databases · Web: Frontend Architecture, HTTP/HTTPS, Debugging · Technical: System Architecture, Requirements · Delivery: Agile/Scrum, Jira, Notion, Git
 
 ## Soft Skills
 
-- Team Management & Leadership
-- Data-Driven Decision Making
-- Cross-functional Collaboration
-- Strong Communication
-- Analytical & Critical Thinking
-- Problem Solving
-- Research
-- Result-Oriented
-- Ownership & Accountability
+Team Management & Leadership · Data-Driven Decision Making · Cross-functional Collaboration · Strong Communication · Analytical & Critical Thinking · Problem Solving · Research · Result-Oriented · Ownership & Accountability
 
 ## Education
 
@@ -87,3 +73,8 @@ Technical Product Manager with a software engineering background, experienced in
 - Armenian (Native)
 - English (Upper Intermediate)
 - Russian (Advanced)
+
+## Products I Managed
+
+- Aviation Weather
+- Wind Forecast
