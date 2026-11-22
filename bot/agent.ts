@@ -4,11 +4,8 @@ export default defineAgent({
   description:
     'Finds the 15 best-fit Product Manager / Product Owner roles per day and prepares a tailored CV and cover letter for each.',
   model: {
-    id: 'grok-4.5',
-    params: [
-      { id: 'effort', value: 'high' },
-      { id: 'fast', value: 'true' },
-    ],
+    id: 'composer-2.5',
+    params: [{ id: 'effort', value: 'high' }],
   },
   hosting: {
     egressDomains: [
