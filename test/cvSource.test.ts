@@ -16,8 +16,8 @@ describe('master CV source', () => {
       canvaDesignId: 'DAHYNhleQV4',
     });
     assert.equal(result.status, 'missing');
-    assert.equal(result.canvaDesignId, 'DAHZCxr0zlo');
-    assert.match(result.canvaDesignUrl, /DAHZCxr0zlo/);
+    assert.equal(result.canvaDesignId, 'DAHaQ8hNl3g');
+    assert.match(result.canvaDesignUrl, /DAHaQ8hNl3g/);
   });
 
   it('asks for a fresh Canva read when the current design was not refreshed today', () => {
