@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { readFile, readdir } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { renderIssueTable, roleKey, selectJobsToEmail } from '../bot/lib/emailDigest.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const reviewDir = join(root, 'review');
@@ -32,17 +33,6 @@ function decode(value) {
     .replace(/&#39;/g, "'");
 }
 
-function roleKey(company, title) {
-  const clean = (value) =>
-    value
-      .toLowerCase()
-      .replace(/\b(inc|incorporated|llc|ltd|limited|gmbh|group|holding|holdings|armenia|senior|sr|junior|jr|lead)\b/g, ' ')
-      .replace(/[^a-z0-9]+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-  return `${clean(company)}|${clean(title)}`;
-}
-
 function parseDigest(html) {
   const date = /<h1>.*?·\s*(\d{4}-\d{2}-\d{2})<\/h1>/.exec(html)?.[1];
   const seenIds = new Set();
@@ -63,23 +53,6 @@ function parseDigest(html) {
     jobs.push({ id, title, company: company ?? '', location: location ?? '', source, score });
   }
   return { date, jobs };
-}
-
-function cell(value) {
-  return value.replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
-}
-
-function table(jobs) {
-  const lines = [
-    '| # | Fit | Role | Company | Location | Source |',
-    '| - | --- | ---- | ------- | -------- | ------ |',
-  ];
-  jobs.forEach((job, index) => {
-    lines.push(
-      `| ${index + 1} | ${job.score}% | ${cell(job.title)} | ${cell(job.company)} | ${cell(job.location)} | ${cell(job.source)} |`,
-    );
-  });
-  return lines.join('\n');
 }
 
 function redact(text) {
@@ -128,20 +101,27 @@ async function sourceErrors(date) {
   }
 }
 
-const { date, jobs } = await latestReview();
-if (jobs.length === 0) {
+async function readDelivered() {
+  try {
+    const parsed = JSON.parse(await readFile(join(root, 'state/delivered.json'), 'utf8'));
+    return Array.isArray(parsed.jobs) ? parsed.jobs : [];
+  } catch {
+    return [];
+  }
+}
+
+const { date, jobs: pageJobs } = await latestReview();
+if (pageJobs.length === 0) {
   console.error(`Review page for ${date} has no roles, so nothing was emailed.`);
   process.exit(1);
 }
 
+const delivered = await readDelivered();
 const errors = await sourceErrors(date);
 if (process.argv.includes('--dry-run')) {
-  console.log(`${titlePlaceholder(jobs, date)}\n${jobs.length} roles\n${errors.join('; ')}`);
+  const preview = selectJobsToEmail({ jobs: pageJobs, date, delivered, priorIssues: [] });
+  console.log(`${preview.length} new matches for ${date}\n${preview.length} roles\n${errors.join('; ')}`);
   process.exit(0);
-}
-
-function titlePlaceholder(parsedJobs, parsedDate) {
-  return `${parsedJobs.length} new matches for ${parsedDate}`;
 }
 
 const key = process.env.CURSOR_API_KEY;
@@ -151,20 +131,6 @@ if (!key) {
 }
 const { owner: OWNER, repo: REPO, branch: BRANCH, reviewPrefix } = githubRepo();
 const reviewUrl = `https://htmlpreview.github.io/?https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${reviewPrefix}/${date}.html`;
-const title = `${jobs.length} new matches for ${date}`;
-const body = [
-  `**${title}**`,
-  '',
-  `Review page: ${reviewUrl}`,
-  '',
-  table(jobs),
-  '',
-  errors.length > 0 ? `Sources with errors: ${errors.join('; ')}` : '',
-  '',
-  MENTION,
-]
-  .filter((line, index, all) => line !== '' || all[index - 1] !== '')
-  .join('\n');
 
 const tokenResponse = await fetch('https://api.cursor.com/v0/scm-events/github-token', {
   method: 'POST',
@@ -182,46 +148,86 @@ if (typeof token !== 'string' || token === '') {
   process.exit(1);
 }
 
-const existing = await github(
-  token,
-  'GET',
-  `/repos/${OWNER}/${REPO}/issues?state=all&per_page=50&creator=app/cursor`,
-);
-const already = Array.isArray(existing.body)
-  ? existing.body.find((issue) => issue.title === title)
-  : undefined;
-if (already?.html_url && !process.argv.includes('--remind')) {
+async function listDigestIssues() {
+  const issues = [];
+  for (let page = 1; page <= 20; page += 1) {
+    const response = await github(
+      token,
+      'GET',
+      `/repos/${OWNER}/${REPO}/issues?state=all&per_page=100&page=${page}`,
+    );
+    if (!response.ok || !Array.isArray(response.body)) {
+      return { ok: false, status: response.status, issues: [] };
+    }
+    for (const issue of response.body) {
+      if (issue.pull_request) continue;
+      issues.push({
+        title: typeof issue.title === 'string' ? issue.title : '',
+        body: typeof issue.body === 'string' ? issue.body : '',
+        html_url: issue.html_url,
+        number: issue.number,
+      });
+    }
+    if (response.body.length < 100) break;
+  }
+  return { ok: true, issues };
+}
+
+function alreadySent(issues) {
+  const existing = issues.find((issue) => /^\d+ new matches for \d{4}-\d{2}-\d{2}$/.test(issue.title) && issue.title.endsWith(date));
   console.log(
     JSON.stringify({
       delivered: false,
       reason: 'already-sent',
-      url: already.html_url,
-      author: already.user?.login ?? null,
+      date,
+      ...(existing?.html_url ? { url: existing.html_url } : {}),
     }),
   );
   process.exit(0);
 }
 
-if (already?.html_url && process.argv.includes('--remind')) {
-  const comment = await github(token, 'POST', `/repos/${OWNER}/${REPO}/issues/${already.number}/comments`, {
-    body,
-  });
-  if (!comment.ok) {
-    console.error(
-      `Could not remind with the digest (${comment.status}): ${redact(JSON.stringify(comment.body)).slice(0, 400)}`,
-    );
-    process.exit(1);
-  }
-  console.log(
-    JSON.stringify({
-      delivered: true,
-      reason: 'reminded',
-      url: comment.body.html_url,
-      author: comment.body.user?.login ?? null,
-    }),
-  );
-  process.exit(0);
+async function unsentJobs() {
+  const listed = await listDigestIssues();
+  if (!listed.ok) return listed;
+  return {
+    ok: true,
+    issues: listed.issues,
+    jobs: selectJobsToEmail({ jobs: pageJobs, date, delivered, priorIssues: listed.issues }),
+  };
 }
+
+// The previous skip key was the issue title, which includes the role count.
+// A retry that dropped one role ("8 new matches" then "7 new matches") missed
+// the earlier issue and emailed the rest again. Match roles instead.
+const firstPass = await unsentJobs();
+if (!firstPass.ok) {
+  console.error(`Could not check previously emailed digests (${firstPass.status}), so nothing was emailed.`);
+  process.exit(1);
+}
+if (firstPass.jobs.length === 0) alreadySent(firstPass.issues);
+
+const secondPass = await unsentJobs();
+if (!secondPass.ok) {
+  console.error(`Could not check previously emailed digests (${secondPass.status}), so nothing was emailed.`);
+  process.exit(1);
+}
+const jobs = secondPass.jobs;
+if (jobs.length === 0) alreadySent(secondPass.issues);
+
+const title = `${jobs.length} new matches for ${date}`;
+const body = [
+  `**${title}**`,
+  '',
+  `Review page: ${reviewUrl}`,
+  '',
+  renderIssueTable(jobs),
+  '',
+  errors.length > 0 ? `Sources with errors: ${errors.join('; ')}` : '',
+  '',
+  MENTION,
+]
+  .filter((line, index, all) => line !== '' || all[index - 1] !== '')
+  .join('\n');
 
 const created = await github(token, 'POST', `/repos/${OWNER}/${REPO}/issues`, { title, body });
 if (created.ok) {

@@ -56,8 +56,11 @@ letter. You never press Send or submit a form yourself.
 8. **Publish** with `publish_digest` and reply with the summary below. `publish_digest` also
    writes `review/<date>.html`.
 9. **Email the same summary** to sam.demirtshyan@gmail.com by running
-   `node scripts/email-digest.mjs`. That opens a GitHub issue as the Cursor app and mentions
-   @Samvel1852, which is what delivers the table to that inbox. Do not send the digest as
+   `node scripts/email-digest.mjs` once. That opens a GitHub issue as the Cursor app and mentions
+   @Samvel1852, which is what delivers the table to that inbox. The script emails a role only
+   when it was not already emailed and was not saved in `state/delivered.json` on an earlier
+   day. A second run for the same date does nothing unless the review page has new roles.
+   Do not run it again to retry a table that was already sent. Do not send the digest as
    Samvel himself, and do not print API keys. If the script cannot authenticate, still reply
    with the summary below.
 
