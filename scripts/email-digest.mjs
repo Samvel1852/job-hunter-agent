@@ -2,7 +2,13 @@ import { execFileSync } from 'node:child_process';
 import { readFile, readdir } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { renderIssueTable, roleKey, selectJobsToEmail } from '../bot/lib/emailDigest.ts';
+import {
+  mergeDigestJobs,
+  parseEmailedJobs,
+  planDailyEmail,
+  renderDigestIssueBody,
+  roleKey,
+} from '../bot/lib/emailDigest.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const reviewDir = join(root, 'review');
@@ -119,8 +125,9 @@ if (pageJobs.length === 0) {
 const delivered = await readDelivered();
 const errors = await sourceErrors(date);
 if (process.argv.includes('--dry-run')) {
-  const preview = selectJobsToEmail({ jobs: pageJobs, date, delivered, priorIssues: [] });
-  console.log(`${preview.length} new matches for ${date}\n${preview.length} roles\n${errors.join('; ')}`);
+  const preview = planDailyEmail({ jobs: pageJobs, date, delivered, priorIssues: [] });
+  const count = preview.action === 'send' ? preview.jobs.length : 0;
+  console.log(`${count} new matches for ${date}\n${count} roles\n${errors.join('; ')}`);
   process.exit(0);
 }
 
@@ -173,100 +180,88 @@ async function listDigestIssues() {
   return { ok: true, issues };
 }
 
-function alreadySent(issues) {
-  const existing = issues.find((issue) => /^\d+ new matches for \d{4}-\d{2}-\d{2}$/.test(issue.title) && issue.title.endsWith(date));
+function sameDayIssue(issues) {
+  return issues
+    .filter((issue) => /^\d+ new matches for \d{4}-\d{2}-\d{2}$/.test(issue.title) && issue.title.endsWith(date))
+    .sort((left, right) => left.number - right.number)[0];
+}
+
+async function finishAlreadySent(issues, additions) {
+  const existing = sameDayIssue(issues);
+  let updated = false;
+  // Editing the issue body does not mention anyone new and does not open a
+  // second issue, so it does not send another email. A comment would.
+  if (existing?.number && existing.body?.includes(MENTION) && additions.length > 0) {
+    const jobs = mergeDigestJobs(parseEmailedJobs(existing.body), additions);
+    const reviewMatch = /Review page: (\S+)/.exec(existing.body);
+    const patched = await github(token, 'PATCH', `/repos/${OWNER}/${REPO}/issues/${existing.number}`, {
+      title: `${jobs.length} new matches for ${date}`,
+      body: renderDigestIssueBody({
+        date,
+        reviewUrl: reviewMatch?.[1] ?? reviewUrl,
+        jobs,
+        errors,
+        mention: MENTION,
+      }),
+    });
+    updated = patched.ok;
+    if (!patched.ok) {
+      console.error(
+        `Could not record new roles on the existing digest (${patched.status}), so no second email was sent.`,
+      );
+    }
+  }
   console.log(
     JSON.stringify({
       delivered: false,
       reason: 'already-sent',
       date,
+      updated,
       ...(existing?.html_url ? { url: existing.html_url } : {}),
     }),
   );
   process.exit(0);
 }
 
-async function unsentJobs() {
+async function listedPlan() {
   const listed = await listDigestIssues();
   if (!listed.ok) return listed;
   return {
     ok: true,
     issues: listed.issues,
-    jobs: selectJobsToEmail({ jobs: pageJobs, date, delivered, priorIssues: listed.issues }),
+    plan: planDailyEmail({ jobs: pageJobs, date, delivered, priorIssues: listed.issues }),
   };
 }
 
-// The previous skip key was the issue title, which includes the role count.
-// A retry that dropped one role ("8 new matches" then "7 new matches") missed
-// the earlier issue and emailed the rest again. Match roles instead.
-const firstPass = await unsentJobs();
+const firstPass = await listedPlan();
 if (!firstPass.ok) {
   console.error(`Could not check previously emailed digests (${firstPass.status}), so nothing was emailed.`);
   process.exit(1);
 }
-if (firstPass.jobs.length === 0) alreadySent(firstPass.issues);
+if (firstPass.plan.action === 'skip') await finishAlreadySent(firstPass.issues, firstPass.plan.additions);
 
-const secondPass = await unsentJobs();
+const secondPass = await listedPlan();
 if (!secondPass.ok) {
   console.error(`Could not check previously emailed digests (${secondPass.status}), so nothing was emailed.`);
   process.exit(1);
 }
-const jobs = secondPass.jobs;
-if (jobs.length === 0) alreadySent(secondPass.issues);
+if (secondPass.plan.action === 'skip') await finishAlreadySent(secondPass.issues, secondPass.plan.additions);
 
+const jobs = secondPass.plan.jobs;
 const title = `${jobs.length} new matches for ${date}`;
-const body = [
-  `**${title}**`,
-  '',
-  `Review page: ${reviewUrl}`,
-  '',
-  renderIssueTable(jobs),
-  '',
-  errors.length > 0 ? `Sources with errors: ${errors.join('; ')}` : '',
-  '',
-  MENTION,
-]
-  .filter((line, index, all) => line !== '' || all[index - 1] !== '')
-  .join('\n');
-
+const body = renderDigestIssueBody({ date, reviewUrl, jobs, errors, mention: MENTION });
 const created = await github(token, 'POST', `/repos/${OWNER}/${REPO}/issues`, { title, body });
-if (created.ok) {
-  console.log(
-    JSON.stringify({
-      delivered: true,
-      url: created.body.html_url,
-      author: created.body.user?.login ?? null,
-      number: created.body.number,
-    }),
-  );
-  process.exit(0);
-}
-
-const pulls = await github(
-  token,
-  'GET',
-  `/repos/${OWNER}/${REPO}/pulls?head=${OWNER}:${BRANCH}&state=open`,
-);
-const pull = Array.isArray(pulls.body) ? pulls.body[0] : undefined;
-if (!pull?.number) {
+if (!created.ok) {
   console.error(
     `Could not open the digest issue (${created.status}): ${redact(JSON.stringify(created.body)).slice(0, 400)}`,
-  );
-  process.exit(1);
-}
-const comment = await github(token, 'POST', `/repos/${OWNER}/${REPO}/issues/${pull.number}/comments`, {
-  body,
-});
-if (!comment.ok) {
-  console.error(
-    `Could not comment with the digest (${comment.status}): ${redact(JSON.stringify(comment.body)).slice(0, 400)}`,
   );
   process.exit(1);
 }
 console.log(
   JSON.stringify({
     delivered: true,
-    url: comment.body.html_url,
-    author: comment.body.user?.login ?? null,
+    url: created.body.html_url,
+    author: created.body.user?.login ?? null,
+    number: created.body.number,
   }),
 );

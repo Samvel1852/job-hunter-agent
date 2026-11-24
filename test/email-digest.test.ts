@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
+  mergeDigestJobs,
   parseEmailedJobs,
+  planDailyEmail,
+  renderDigestIssueBody,
   renderIssueTable,
   roleKey,
   selectJobsToEmail,
@@ -40,6 +43,13 @@ describe('digest email dedupe', () => {
     const emailed = [...first, ...second];
     assert.equal(new Set(emailed.map((item) => item.id)).size, emailed.length);
     assert.deepEqual(second, []);
+    const plan = planDailyEmail({
+      jobs: roles,
+      date,
+      delivered: [],
+      priorIssues: sent(first, date),
+    });
+    assert.equal(plan.action, 'skip');
   });
 
   it('is a no-op when a same-day retry shortens the list', () => {
@@ -51,20 +61,32 @@ describe('digest email dedupe', () => {
       fingerprint: roleKey(item.company, item.title),
     }));
     assert.deepEqual(selectJobsToEmail({ jobs: shorter, date, delivered, priorIssues }), []);
+    assert.equal(planDailyEmail({ jobs: shorter, date, delivered, priorIssues }).action, 'skip');
   });
 
-  it('emails only a role that was not already sent', () => {
+  it('does not send a second email the same day even when the roles differ', () => {
     const extra = job('linkedin:4', 'Delta', 'Product Owner');
-    const selected = selectJobsToEmail({
-      jobs: [...roles, extra],
+    const priorIssues = [{ title: '14 new matches for 2026-11-23', body: renderIssueTable(roles) }];
+    const plan = planDailyEmail({
+      jobs: [extra],
       date,
       delivered: [],
-      priorIssues: sent(roles, date),
+      priorIssues,
     });
+    if (plan.action !== 'skip') assert.fail('a same-day rerun must not send');
     assert.deepEqual(
-      selected.map((item) => item.id),
+      plan.additions.map((item) => item.id),
       ['linkedin:4'],
     );
+    const body = renderDigestIssueBody({
+      date,
+      reviewUrl: 'https://example.test/review',
+      jobs: mergeDigestJobs(parseEmailedJobs(priorIssues[0].body), plan.additions),
+      mention: '@Samvel1852',
+    });
+    assert.equal(body.split('@Samvel1852').length - 1, 1);
+    assert.ok(body.includes('Delta'));
+    assert.ok(body.includes('Acme'));
   });
 
   it('skips a role saved as delivered on an earlier day', () => {
@@ -75,6 +97,15 @@ describe('digest email dedupe', () => {
       priorIssues: [],
     });
     assert.deepEqual(selected, []);
+  });
+
+  it('sends the first email of the day when no digest issue exists yet', () => {
+    const plan = planDailyEmail({ jobs: roles, date, delivered: [], priorIssues: [] });
+    if (plan.action !== 'send') assert.fail('the first run of the day should send');
+    assert.deepEqual(
+      plan.jobs.map((item) => item.id),
+      roles.map((item) => item.id),
+    );
   });
 
   it('still emails a job that was saved today and not emailed yet', () => {
