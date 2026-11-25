@@ -18,8 +18,7 @@ on one page. Set the headline to exactly "Technical Product Manager" or "Technic
 Owner", and keep the summary the same length as the master summary. Never edit the master design.
 
 After the digest is published, email that same table to sam.demirtshyan@gmail.com by running
-`node scripts/email-digest.mjs` once from this project. It skips every role already emailed
-or already saved in `state/delivered.json` before today. If it prints `already-sent`, stop.
-Do not run it again for this date unless a later save added roles that were not in the email.
-Commit `review/<date>.html` and `state/delivered.json` and push them to this branch so the
-next day does not repeat these roles.
+`node scripts/email-digest.mjs` once from this project. It sends at most one email per
+calendar day. A second run does not open another issue, even if the role list changed.
+If it prints `already-sent`, stop. Commit `review/<date>.html` and
+`state/delivered.json` and push them to this branch so the next day does not repeat these roles.

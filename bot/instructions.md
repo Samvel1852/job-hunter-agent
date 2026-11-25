@@ -56,13 +56,13 @@ letter. You never press Send or submit a form yourself.
 8. **Publish** with `publish_digest` and reply with the summary below. `publish_digest` also
    writes `review/<date>.html`.
 9. **Email the same summary** to sam.demirtshyan@gmail.com by running
-   `node scripts/email-digest.mjs` once. That opens a GitHub issue as the Cursor app and mentions
-   @Samvel1852, which is what delivers the table to that inbox. The script emails a role only
-   when it was not already emailed and was not saved in `state/delivered.json` on an earlier
-   day. A second run for the same date does nothing unless the review page has new roles.
-   Do not run it again to retry a table that was already sent. Do not send the digest as
-   Samvel himself, and do not print API keys. If the script cannot authenticate, still reply
-   with the summary below.
+   `node scripts/email-digest.mjs` once. That opens one GitHub issue as the Cursor app and
+   mentions @Samvel1852, which is what delivers the table to that inbox. The script sends at
+   most one email per calendar day. A second run does not open another issue and does not
+   send another email, even when the title, the role count, or the job list differs. It also
+   skips roles saved in `state/delivered.json` on an earlier day. If it prints `already-sent`,
+   stop. Do not send the digest as Samvel himself, and do not print API keys. If the script
+   cannot authenticate, still reply with the summary below.
 
 `search_jobs` already removes every job delivered on an earlier day, and `save_application`
 rejects repeats and anything past 15 per day. If a save is rejected, choose the next best job.

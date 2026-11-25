@@ -111,13 +111,15 @@ function blockedByEarlierDelivery(job: DigestJob, role: string, delivered: Deliv
   });
 }
 
+/** Date from a digest issue title, such as "11 new matches for 2026-11-24". */
+export function digestIssueDate(title: string): string | undefined {
+  return DIGEST_TITLE.exec(title)?.[2];
+}
+
 /**
- * Jobs from this review page that still need an email.
- * A role already listed in any digest issue, or saved in the delivered ledger
- * before this date, is left out. A second pass for the same date therefore
- * sends nothing unless the page has a role that was neither emailed nor
- * delivered earlier. Today's ledger entries do not count as already emailed:
- * those packs are saved before the first send.
+ * Roles on this page that are not already listed in a digest issue and were
+ * not saved in the delivered ledger before this date. Today's ledger entries
+ * stay eligible: those packs are saved before the first send.
  */
 export function selectJobsToEmail(input: {
   jobs: DigestJob[];
@@ -154,4 +156,63 @@ export function selectJobsToEmail(input: {
   }
   if (sameDateOpaque) return [];
   return selected;
+}
+
+export type DailyEmailPlan =
+  | { action: 'send'; jobs: DigestJob[] }
+  | { action: 'skip'; reason: 'already-sent'; additions: DigestJob[] };
+
+/**
+ * One digest email per calendar day. A digest issue for this date means the
+ * email already went out, so this plan never sends again, even when the title,
+ * the role count, or the job list differs. New roles are returned as additions
+ * for a silent edit of that issue.
+ */
+export function planDailyEmail(input: {
+  jobs: DigestJob[];
+  date: string;
+  delivered?: DeliveredJob[];
+  priorIssues?: PriorDigest[];
+}): DailyEmailPlan {
+  const fresh = selectJobsToEmail(input);
+  const alreadySent = (input.priorIssues ?? []).some((issue) => digestIssueDate(issue.title ?? '') === input.date);
+  if (alreadySent || fresh.length === 0) {
+    return { action: 'skip', reason: 'already-sent', additions: alreadySent ? fresh : [] };
+  }
+  return { action: 'send', jobs: fresh };
+}
+
+export function mergeDigestJobs(existing: DigestJob[], additions: DigestJob[]): DigestJob[] {
+  const merged: DigestJob[] = [];
+  const seen = new Set<string>();
+  for (const job of [...existing, ...additions]) {
+    if (job.title.trim() === '') continue;
+    const role = roleKey(job.company, job.title);
+    if (seen.has(role)) continue;
+    seen.add(role);
+    merged.push(job);
+  }
+  return merged;
+}
+
+export function renderDigestIssueBody(input: {
+  date: string;
+  reviewUrl: string;
+  jobs: DigestJob[];
+  errors?: string[];
+  mention?: string;
+}): string {
+  const title = `${input.jobs.length} new matches for ${input.date}`;
+  const lines = [
+    `**${title}**`,
+    '',
+    `Review page: ${input.reviewUrl}`,
+    '',
+    renderIssueTable(input.jobs),
+    '',
+    input.errors && input.errors.length > 0 ? `Sources with errors: ${input.errors.join('; ')}` : '',
+    '',
+    input.mention ?? '',
+  ];
+  return lines.filter((line, index, all) => line !== '' || all[index - 1] !== '').join('\n');
 }
